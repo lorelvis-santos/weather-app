@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, type ChangeEvent, type SubmitEvent } from "react";
 import { countries } from "../../data/countries";
 import styles from "./Form.module.css";
-import type { SearchType } from "../../types";
+import type { AlertType, SearchType } from "../../types";
+import Alert from "../Alert/Alert";
 
 export default function Form() {
   const [search, setSearch] = useState<SearchType>({
@@ -9,8 +10,36 @@ export default function Form() {
     countryCode: "",
   });
 
+  const [alert, setAlert] = useState<AlertType>({
+    message: "",
+    type: "none",
+  });
+
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>,
+  ) => {
+    setSearch({
+      ...search,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = (e: SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (Object.values(search).includes("")) {
+      setAlert({
+        message: "Todos los campos son obligatorios",
+        type: "error",
+      });
+      return;
+    }
+  };
+
   return (
-    <form className={styles.form}>
+    <form className={styles.form} onSubmit={handleSubmit}>
+      {alert.type !== "none" && <Alert alert={alert} />}
+
       <div className={styles.form__field}>
         <label className={styles.form__label} htmlFor="city">
           Ciudad
@@ -21,7 +50,9 @@ export default function Form() {
           className={styles.form__input}
           type="text"
           placeholder="Ej. Cotuí"
-          required
+          value={search.city}
+          // required
+          onChange={handleChange}
         />
       </div>
 
@@ -29,7 +60,13 @@ export default function Form() {
         <label className={styles.form__label} htmlFor="country">
           País
         </label>
-        <select className={styles.form__select} name="country" id="country">
+        <select
+          className={styles.form__select}
+          name="countryCode"
+          id="countryCode"
+          value={search.countryCode}
+          onChange={handleChange}
+        >
           <option selected disabled>
             Selecciona una opción
           </option>
