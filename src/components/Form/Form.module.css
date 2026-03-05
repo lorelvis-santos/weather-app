@@ -1,0 +1,44 @@
+.form,
+.form__field {
+  display: flex;
+  flex-direction: column;
+}
+
+.form {
+  gap: 2rem;
+}
+
+.form__field {
+  gap: 0.8rem;
+}
+
+.form__label {
+  font-size: 1.6rem;
+}
+
+.form__input,
+.form__select {
+  padding: 1.2rem;
+  border-radius: 0.8rem;
+  border: solid 2px var(--white);
+  background-color: transparent;
+  color: var(--white);
+  font-weight: 500;
+}
+
+.form__input ::placeholder,
+.form__select ::placeholder {
+  color: lightgray;
+}
+
+.form__submit {
+  padding-block: 1.2rem;
+  border-radius: 0.8rem;
+  border: none;
+  background-color: var(--primary);
+  font-weight: bold;
+  color: var(--white);
+  font-size: 1.6rem;
+  text-transform: uppercase;
+  margin-top: 2rem;
+}
