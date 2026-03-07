@@ -4,7 +4,11 @@ import styles from "./Form.module.css";
 import type { AlertType, SearchType } from "../../types";
 import Alert from "../Alert/Alert";
 
-export default function Form() {
+type FormProps = {
+  fetchWeather: (search: SearchType) => Promise<void>;
+};
+
+export default function Form({ fetchWeather }: FormProps) {
   const [search, setSearch] = useState<SearchType>({
     city: "",
     countryCode: "",
@@ -34,6 +38,8 @@ export default function Form() {
       });
       return;
     }
+
+    fetchWeather(search);
   };
 
   return (
@@ -65,11 +71,10 @@ export default function Form() {
           name="countryCode"
           id="countryCode"
           value={search.countryCode}
+          defaultValue={""}
           onChange={handleChange}
         >
-          <option selected disabled>
-            Selecciona una opción
-          </option>
+          <option value={""}>Selecciona una opción</option>
           {countries.map((country) => (
             <option key={country.code} value={country.code}>
               {country.name}
