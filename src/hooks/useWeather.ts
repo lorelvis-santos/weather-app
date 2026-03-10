@@ -1,32 +1,33 @@
 import axios from "axios";
-import { object, string, number, type InferOutput, parse } from "valibot";
-// import { z } from "zod";
+// import { object, string, number, type InferOutput, parse } from "valibot";
+import { z } from "zod";
 import type { SearchType } from "../types";
+import { useState } from "react";
 
 // Valibot
-const WeatherSchema = object({
-  name: string(),
-  main: object({
-    temp: number(),
-    temp_max: number(),
-    temp_min: number(),
-  }),
-});
-
-type Weather = InferOutput<typeof WeatherSchema>;
-
-// Zod
-// Se necesita crear un esquema primero de la siguiente forma
-// const Weather = z.object({
-//   name: z.string(),
-//   main: z.object({
-//     temp: z.number(),
-//     temp_max: z.number(),
-//     temp_min: z.number(),
+// const WeatherSchema = object({
+//   name: string(),
+//   main: object({
+//     temp: number(),
+//     temp_max: number(),
+//     temp_min: number(),
 //   }),
 // });
 
-// type Weather = z.infer<typeof Weather>;
+// type Weather = InferOutput<typeof WeatherSchema>;
+
+// Zod
+// Se necesita crear un esquema primero de la siguiente forma
+const Weather = z.object({
+  name: z.string(),
+  main: z.object({
+    temp: z.number(),
+    temp_max: z.number(),
+    temp_min: z.number(),
+  }),
+});
+
+type Weather = z.infer<typeof Weather>;
 
 // function isWeatherResponse(response: unknown): response is Weather {
 //   return (
@@ -40,6 +41,15 @@ type Weather = InferOutput<typeof WeatherSchema>;
 // }
 
 export default function useWeather() {
+  const [weather, setWeather] = useState<Weather>({
+    name: "",
+    main: {
+      temp: 0,
+      temp_max: 0,
+      temp_min: 0,
+    },
+  });
+
   const fetchWeather = async (search: SearchType) => {
     const appId = import.meta.env.VITE_APP_KEY;
 
@@ -63,20 +73,25 @@ export default function useWeather() {
 
       // Forma 3 de trabajar con apis:
       //  - Con Zod
-      // const { data: weatherResult } = await axios(weatherUrl);
-      // const result = z.safeParse(Weather, weatherResult);
+      const { data: weatherResult } = await axios(weatherUrl);
+      const result = z.safeParse(Weather, weatherResult);
+
+      if (result.success) {
+        setWeather(result.data);
+      }
 
       // Forma 3 de trabajar con apis:
       //  - Con Valibot
-      const { data: weatherResult } = await axios(weatherUrl);
-      const result = parse(WeatherSchema, weatherResult);
-      console.log(result);
+      // const { data: weatherResult } = await axios(weatherUrl);
+      // const result = parse(WeatherSchema, weatherResult);
+      // console.log(result);
     } catch (error) {
       console.log(error);
     }
   };
 
   return {
+    weather,
     fetchWeather,
   };
 }
