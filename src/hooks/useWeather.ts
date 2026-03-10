@@ -1,19 +1,32 @@
 import axios from "axios";
-import { z } from "zod";
+import { object, string, number, type InferOutput, parse } from "valibot";
+// import { z } from "zod";
 import type { SearchType } from "../types";
 
-// Zod
-// Se necesita crear un esquema primero de la siguiente forma
-const Weather = z.object({
-  name: z.string(),
-  main: z.object({
-    temp: z.number(),
-    temp_max: z.number(),
-    temp_min: z.number(),
+// Valibot
+const WeatherSchema = object({
+  name: string(),
+  main: object({
+    temp: number(),
+    temp_max: number(),
+    temp_min: number(),
   }),
 });
 
-type Weather = z.infer<typeof Weather>;
+type Weather = InferOutput<typeof WeatherSchema>;
+
+// Zod
+// Se necesita crear un esquema primero de la siguiente forma
+// const Weather = z.object({
+//   name: z.string(),
+//   main: z.object({
+//     temp: z.number(),
+//     temp_max: z.number(),
+//     temp_min: z.number(),
+//   }),
+// });
+
+// type Weather = z.infer<typeof Weather>;
 
 // function isWeatherResponse(response: unknown): response is Weather {
 //   return (
@@ -48,8 +61,15 @@ export default function useWeather() {
       // const result = isWeatherResponse(weatherResult);
       // console.log(result);
 
+      // Forma 3 de trabajar con apis:
+      //  - Con Zod
+      // const { data: weatherResult } = await axios(weatherUrl);
+      // const result = z.safeParse(Weather, weatherResult);
+
+      // Forma 3 de trabajar con apis:
+      //  - Con Valibot
       const { data: weatherResult } = await axios(weatherUrl);
-      const result = z.safeParse(Weather, weatherResult);
+      const result = parse(WeatherSchema, weatherResult);
       console.log(result);
     } catch (error) {
       console.log(error);
