@@ -41,17 +41,24 @@ export type Weather = z.infer<typeof Weather>;
 // }
 
 export default function useWeather() {
-  const [weather, setWeather] = useState<Weather>({
+  const initialState = {
     name: "",
     main: {
       temp: 0,
       temp_max: 0,
       temp_min: 0,
     },
-  });
+  };
+
+  const [weather, setWeather] = useState<Weather>(initialState);
+
+  const [loading, setLoading] = useState(false);
 
   const fetchWeather = async (search: SearchType) => {
     const appId = import.meta.env.VITE_APP_KEY;
+
+    setWeather(initialState);
+    setLoading(true);
 
     try {
       const geoUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${search.city},${search.countryCode}&appid=${appId}`;
@@ -87,6 +94,8 @@ export default function useWeather() {
       // console.log(result);
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -96,5 +105,6 @@ export default function useWeather() {
     weather,
     fetchWeather,
     hasWeatherData,
+    loading,
   };
 }
